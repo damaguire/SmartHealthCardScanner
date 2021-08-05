@@ -36,7 +36,7 @@ function Navbar() {
             <HomeIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            Smart Health Card Scanner
+            Smart Health Card Scanner 1.1
           </Typography>
           <Button color="inherit" href="/file">Scan From File</Button>
           <Button color="inherit" href="https://spec.smarthealth.cards/">Learn More</Button>
