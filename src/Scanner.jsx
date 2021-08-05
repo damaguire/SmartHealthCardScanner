@@ -67,26 +67,30 @@ const Scanner = () => {
     try {
       let jwks;
       const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss
-      if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
-        jwks = {
-          "keys": [
-            {
-              "kty": "EC",
-              "kid": "2bPE3l4LxynUR5KSLnEu7un0wSd3BvKnlYa3RU65DTU",
-              "use": "sig",
-              "alg": "ES256",
-              "crv": "P-256",
-              "x": "mvcD0OU0MNbqnvHoo7xqomxDcF5-lDjosplo8ajHTfU",
-              "y": "yBGAkYj3BN-zkn6RCfGzz-H38obadiit9Are_RdcLzQ"
-            }
-          ]
-        };
-        setInVCI(false);
-      } else {
+      // if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
+      //   jwks = {
+      //     "keys": [
+      //       {
+      //         "kty": "EC",
+      //         "kid": "2bPE3l4LxynUR5KSLnEu7un0wSd3BvKnlYa3RU65DTU",
+      //         "use": "sig",
+      //         "alg": "ES256",
+      //         "crv": "P-256",
+      //         "x": "mvcD0OU0MNbqnvHoo7xqomxDcF5-lDjosplo8ajHTfU",
+      //         "y": "yBGAkYj3BN-zkn6RCfGzz-H38obadiit9Are_RdcLzQ"
+      //       }
+      //     ]
+      //   };
+      //   setInVCI(false);
+      // } else {
         let issEndpoint = issuerHere + '/.well-known/jwks.json';
-        const response = await axios.get(issEndpoint)
+        const response = await axios.get(issEndpoint, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        })
         jwks = response.data;
-      }
+      //}
       const keystore = await jose.JWK.asKeyStore(jwks)
       const result = await jose.JWS.createVerify(keystore).verify(data)
       setVerification(true)
