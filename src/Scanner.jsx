@@ -61,15 +61,40 @@ const Scanner = () => {
   const [cvxCode, setCVXCode] = useState('');
   const [vaccDate1, setVaccDate1] = useState('');
   const [vaccDate2, setVaccDate2] = useState('');
+  const [inVCI, setInVCI] = useState(false);
 
   const getIssuerCred = async (data) => {
     try {
+      let jwks;
       const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss
-      const response = await axios.get(issuerHere + '/.well-known/jwks.json')
-      const jwks = response.data;
+      if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
+        jwks = {
+          "keys": [
+            {
+              "kty": "EC",
+              "kid": "2bPE3l4LxynUR5KSLnEu7un0wSd3BvKnlYa3RU65DTU",
+              "use": "sig",
+              "alg": "ES256",
+              "crv": "P-256",
+              "x": "mvcD0OU0MNbqnvHoo7xqomxDcF5-lDjosplo8ajHTfU",
+              "y": "yBGAkYj3BN-zkn6RCfGzz-H38obadiit9Are_RdcLzQ"
+            }
+          ]
+        };
+        setInVCI(false);
+      } else {
+        let issEndpoint = issuerHere + '/.well-known/jwks.json';
+        const response = await axios.get(issEndpoint)
+        jwks = response.data;
+      }
       const keystore = await jose.JWK.asKeyStore(jwks)
       const result = await jose.JWS.createVerify(keystore).verify(data)
       setVerification(true)
+      let issDir = await axios.get("https://raw.githubusercontent.com/the-commons-project/vci-directory/main/vci-issuers.json");
+      if(issDir.data.participating_issuers.some(e => e.iss === issuerHere )) {
+        setInVCI(true);
+      } else {
+      }
       setResult(true)
     } catch (err) {
       setError("Please hold the QR code up for a bit longer!")
@@ -159,11 +184,20 @@ const Scanner = () => {
                     />
                   : [
                     result ?
-                      <div>
-                        <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Payload Verified!</p>
-                        <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Signature Verified!</p>
-                        <p style={{color: "red"}}><ReportIcon style={{fill: "red"}}/> Issuer Not Verified in VCI Directory!</p>
-                      </div>
+                    [
+                      inVCI ?
+                        <div>
+                          <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Payload Verified!</p>
+                          <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Signature Verified!</p>
+                          <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Issuer Verified in VCI Directory!</p>
+                        </div>
+                        :
+                        <div>
+                          <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Payload Verified!</p>
+                          <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Signature Verified!</p>
+                          <p style={{color: "red"}}><ReportIcon style={{fill: "red"}}/> Issuer Not Verified in VCI Directory!</p>
+                        </div>
+                    ]
                     :
                       <div>
                         <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Payload Verified!</p>
