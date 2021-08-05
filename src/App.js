@@ -6,11 +6,14 @@ import { makeStyles } from '@material-ui/core/styles';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Scanner from './Scanner.jsx';
+import ScannerFile from './ScannerFile.jsx';
+import Navbar from './Navbar.js';
 import AppBar from '@material-ui/core/AppBar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,25 +27,38 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+// <div className={classes.root}>
+//   <AppBar position="static">
+//     <Toolbar>
+//       <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+//         <MenuIcon />
+//       </IconButton>
+//       <Typography variant="h6" className={classes.title}>
+//         Smart Health Card Scanner
+//       </Typography>
+//       <Button color="inherit" href="https://spec.smarthealth.cards/">Scan From File</Button>
+//       <Button color="inherit" href="https://spec.smarthealth.cards/">Learn More</Button>
+//     </Toolbar>
+//   </AppBar>
+//   <Scanner />
+// </div>
+
 
 function App() {
   const classes = useStyles();
   const bull = <span className={classes.bullet}>•</span>;
   return (
-    <div className={classes.root}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            Smart Health Card Scanner
-          </Typography>
-          <Button color="inherit" href="https://spec.smarthealth.cards/">Learn More</Button>
-        </Toolbar>
-      </AppBar>
-      <Scanner />
-    </div>
+    <BrowserRouter>
+      <Navbar />
+      <Switch>
+        <Route exact path="/">
+          <Scanner />
+        </Route>
+        <Route path="/file">
+          <ScannerFile />
+        </Route>
+      </Switch>
+    </BrowserRouter>
   );
 }
 
