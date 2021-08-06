@@ -66,6 +66,7 @@ const ScannerFile = () => {
   const [inVCI, setInVCI] = useState(false);
   const [img, setIMG] = useState('');
   const [message, setMessage] = useState('Awaiting File Upload');
+  const [shcFile, setSHCFile] = useState('');
 
   const getIssuerCred = async (data) => {
     try {
@@ -89,6 +90,7 @@ const ScannerFile = () => {
       } else {
         let issEndpoint = issuerHere + '/.well-known/jwks.json';
         const response = await axios.get(issEndpoint)
+        console.log(response.data);
         jwks = response.data;
       }
       const keystore = await jose.JWK.asKeyStore(jwks)
@@ -106,10 +108,18 @@ const ScannerFile = () => {
     }
   }
 
-  const handleScan = (data) => {
+  const handleScan = (data, type) => {
     if (data) {
+      console.log("DATA", data);
       setScanned(true);
-      let splitData = data.split("/")[1].match(/(..?)/g).map((number) => String.fromCharCode(parseInt(number, 10) + 45)).join("");
+      let splitData;
+      if(type === "img") {
+        console.log("IMAGE");
+        splitData = data.split("/")[1].match(/(..?)/g).map((number) => String.fromCharCode(parseInt(number, 10) + 45)).join("");
+      } else {
+        splitData = data;
+      }
+      console.log(splitData);
       setIssuer(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).iss)
       setHeaderJWS(splitData.split(".")[0]);
       setPayloadJWS(splitData.split(".")[1]);
@@ -150,13 +160,27 @@ const ScannerFile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let uplIMG = URL.createObjectURL(e.target.files[0]);
-    const codeReader = new BrowserQRCodeReader();
-    try{
-      const resultImage = await codeReader.decodeFromImageUrl(uplIMG);
-      handleScan(resultImage.text);
-    } catch (error) {
-      setMessage("Unable to read QR in file. Please try a different one!")
+    let fileName = e.target.files[0].name;
+    if(fileName.slice(fileName.length - 4) === '.jpg' || fileName.slice(fileName.length - 4) === '.png') {
+      let uplIMG = URL.createObjectURL(e.target.files[0]);
+      const codeReader = new BrowserQRCodeReader();
+      try{
+        const resultImage = await codeReader.decodeFromImageUrl(uplIMG);
+        handleScan(resultImage.text, "img");
+      } catch (error) {
+        setMessage("Unable to read QR in file. Please try a different one!")
+      }
+    } else if (fileName.slice(fileName.length - 18) === '.smart-health-card') {
+      const reader = new FileReader()
+      let text;
+      reader.readAsText(e.target.files[0]);
+      reader.onload = async (e) => {
+        text = (JSON.parse(e.target.result).verifiableCredential[0])
+        // setSHCFile(e.target.result)
+        handleScan(text, "shc");
+      };
+    } else {
+      setMessage("File type not supported. Only .jpg, .png, and .smart-health-card files are supported!");
     }
   }
 
@@ -169,11 +193,14 @@ const ScannerFile = () => {
         <Container maxWidth="sm" >
           <Card className={classes.root} >
             <CardHeader style={{ textAlign: "center"}}
-              title="Smart Health Card QR Code Scanner"
+              title="Smart Health Card File Reader"
               subheader="All data is handled client side! Nothing is ever sent to the server!"
             />
           <CardHeader style={{ textAlign: "center"}}
               subheader="This tool has not been officially reviewed by a security team so use it at your own risk!"
+            />
+          <CardHeader style={{ textAlign: "center"}}
+              subheader="Upload your QR code in a .jpg or .png format or your .smart-health-card file!"
             />
           <CardContent style={{display: "flex", justifyContent: "center"}} >
             <div>
@@ -246,30 +273,32 @@ const ScannerFile = () => {
                 <Typography paragraph>{vaccDate2}</Typography>
               </CardContent>
             </Collapse>
-            <CardActions disableSpacing>
-              <IconButton
-                className={clsx(classes.expand, {
-                  [classes.expandOpen]: expanded,
-                })}
-                onClick={handleExpandClick}
-                aria-expanded={expanded}
-                aria-label="show more"
-              >
-                <ExpandMoreIcon />
-                <p>Full JWS</p>
-              </IconButton>
-            </CardActions>
+          </Card>
+          <CardActions disableSpacing>
+            <IconButton
+              className={clsx(classes.expand, {
+                [classes.expandOpen]: expanded,
+              })}
+              onClick={handleExpandClick}
+              aria-expanded={expanded}
+              aria-label="show more"
+            >
+              <ExpandMoreIcon />
+              <p>Full JWS</p>
+            </IconButton>
+          </CardActions>
+          <Container style={{overflowWrap: 'break-word'}}>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
               <CardContent>
                 <Typography paragraph variant="h6">Header:</Typography>
                 <JSONPretty id="json-pretty" data={decodedHeader}></JSONPretty>
                 <Typography paragraph variant="h6">Payload:</Typography>
-                <JSONPretty id="json-pretty" data={decodedPayload}></JSONPretty>
+                <Typography paragraph variant="body"><JSONPretty style={{overflowWrap: 'break-word'}} id="json-pretty" data={decodedPayload}></JSONPretty></Typography>
                 <Typography paragraph variant="h6">Signature:</Typography>
                 <Typography paragraph>{signatureJWS}</Typography>
               </CardContent>
             </Collapse>
-          </Card>
+          </Container>
         </Container>
       </Box>
     </div>

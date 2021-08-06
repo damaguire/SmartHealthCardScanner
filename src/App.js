@@ -14,6 +14,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import Keys from './Jwks.js';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,14 +50,19 @@ function App() {
   const bull = <span className={classes.bullet}>•</span>;
   return (
     <BrowserRouter>
-      <Navbar />
       <Switch>
-        <Route exact path="/">
-          <Scanner />
+        <Route exact path="/.well-known/jwks.json">
+          <Keys />
         </Route>
-        <Route path="/file">
-          <ScannerFile />
-        </Route>
+        <div>
+          <Navbar />
+          <Route exact path="/">
+            <Scanner />
+          </Route>
+          <Route path="/file">
+            <ScannerFile />
+          </Route>
+        </div>
       </Switch>
     </BrowserRouter>
   );

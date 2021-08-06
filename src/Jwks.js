@@ -12,7 +12,8 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import HomeIcon from '@material-ui/icons/Home';
 import Toolbar from '@material-ui/core/Toolbar';
-import './jwks.json';
+import List from '@material-ui/core/List';
+import keys from './jwks.json';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,26 +27,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Navbar() {
+const jwkeys = {"keys": [
+  {
+    "kty": "EC",
+    "kid": "2EVUsUMkQMEDbuoMs4FWzyLkxUvfRQfO2q9uHn9TEJI",
+    "use": "sig",
+    "alg": "ES256",
+    "crv": "P-256",
+    "x": "ByXzKs-3yD1dEyhF2PX0SxPzBRbW7w70D4y4MqfZU68",
+    "y": "zDGufZbWTp2b0IGIgWIUWh86vUQczWYprF3Z49vwIPg"
+  }
+]}
+
+function Keys() {
   const classes = useStyles();
   const bull = <span className={classes.bullet}>•</span>;
   return (
     <div className={classes.root}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton href="/" edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <HomeIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            Smart Health Card Scanner 1.2
-          </Typography>
-          <Button color="inherit" href="/.well-known/jwks.json">JWKS</Button>
-          <Button color="inherit" href="/file">Scan From File</Button>
-          <Button color="inherit" href="https://spec.smarthealth.cards/">Learn More</Button>
-        </Toolbar>
-      </AppBar>
+      <p>{JSON.stringify(jwkeys)}</p>
     </div>
   );
 }
 
-export default Navbar;
+export default Keys;

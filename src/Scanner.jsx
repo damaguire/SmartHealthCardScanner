@@ -25,7 +25,7 @@ const pako = require('pako');
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 800
+    maxWidth: 2000
   },
   bullet: {
     display: 'inline-block',
@@ -64,8 +64,6 @@ const Scanner = () => {
   const [inVCI, setInVCI] = useState(false);
 
   const getIssuerCred = async (data) => {
-    let kpx = fetch('https://kpx-consent-uat.kp.org/.well-known/jwks.json')
-    console.log(kpx);
     try {
       let jwks;
       const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss
@@ -87,6 +85,7 @@ const Scanner = () => {
       } else {
         let issEndpoint = issuerHere + '/.well-known/jwks.json';
         const response = await axios.get(issEndpoint)
+        console.log(response.data);
         jwks = response.data;
       }
       const keystore = await jose.JWK.asKeyStore(jwks)
@@ -104,6 +103,46 @@ const Scanner = () => {
     }
   }
 
+  // const getIssuerCred = async (data) => {
+  //   try {
+  //     let jwks;
+  //     const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss
+  //     let issEndpoint = issuerHere + '/.well-known/jwks.json';
+  //     // const myInit = {
+  //     //   method: 'GET'
+  //     // };
+  //     //
+  //     // const myRequest = new Request(issEndpoint, myInit);
+  //     // console.log("fetch", await fetch(myRequest));
+  //     // fetch(myRequest).then(function(response) {
+  //   	// 	return response;
+  //   	// }).then(function(response) {
+  //   	// 	console.log("HERE IS THE RESPONSE", response);
+  //   	// }).catch(function(e){
+  //   	// 	console.log(e);
+  //   	// });
+  //     // console.log("CALL", fR);
+  //     // const response = await axios.get(issEndpoint, {
+  //     //   headers: {
+  //     //     'Origin': "null"
+  //     //   }
+  //     // })
+  //     // jwks = response.data;
+  //     // const keystore = await jose.JWK.asKeyStore(jwks)
+  //     // const result = await jose.JWS.createVerify(keystore).verify(data)
+  //     // setVerification(true)
+  //     // let issDir = await axios.get("https://raw.githubusercontent.com/the-commons-project/vci-directory/main/vci-issuers.json");
+  //     // if(issDir.data.participating_issuers.some(e => e.iss === issuerHere )) {
+  //     //   setInVCI(true);
+  //     // } else {
+  //     // }
+  //     setResult(true)
+  //   } catch (err) {
+  //     setError("Please hold the QR code up for a bit longer!")
+  //     console.log("ERROR:", err);
+  //   }
+  // }
+
   const handleScan = (data) => {
     if (data) {
       setScanned(true);
@@ -112,7 +151,7 @@ const Scanner = () => {
       setHeaderJWS(splitData.split(".")[0]);
       setPayloadJWS(splitData.split(".")[1]);
       setSignatureJWS(splitData.split(".")[2]);
-      setDecodedHeader(JSON.stringify(JSON.parse(Buffer.from(splitData.split(".")[0], "base64"))));
+      setDecodedHeader(JSON.stringify(JSON.parse(Buffer.from(splitData.split(".")[0], "base64")), null, 2));
       setDecodedPayload(JSON.stringify(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'}))));
       console.log(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code);
       setFirstName(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[0].resource.name[0].given[0]);
@@ -149,7 +188,7 @@ const Scanner = () => {
   const classes = useStyles();
   const bull = <span className={classes.bullet}>•</span>;
   return (
-    <div style={{paddingTop:'100px'}}>
+    <div style={{paddingTop:'100px', overflowWrap: 'break-word'}}>
       <Box display="flex" justifyContent="center">
         <Paper elevation={3} />
         <Container maxWidth="sm" >
@@ -237,30 +276,32 @@ const Scanner = () => {
                 <Typography paragraph>{vaccDate2}</Typography>
               </CardContent>
             </Collapse>
-            <CardActions disableSpacing>
-              <IconButton
-                className={clsx(classes.expand, {
-                  [classes.expandOpen]: expanded,
-                })}
-                onClick={handleExpandClick}
-                aria-expanded={expanded}
-                aria-label="show more"
-              >
-                <ExpandMoreIcon />
-                <p>Full JWS</p>
-              </IconButton>
-            </CardActions>
+          </Card>
+          <CardActions disableSpacing>
+            <IconButton
+              className={clsx(classes.expand, {
+                [classes.expandOpen]: expanded,
+              })}
+              onClick={handleExpandClick}
+              aria-expanded={expanded}
+              aria-label="show more"
+            >
+              <ExpandMoreIcon />
+              <p>Full JWS</p>
+            </IconButton>
+          </CardActions>
+          <Container style={{overflowWrap: 'break-word'}}>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
               <CardContent>
                 <Typography paragraph variant="h6">Header:</Typography>
                 <JSONPretty id="json-pretty" data={decodedHeader}></JSONPretty>
                 <Typography paragraph variant="h6">Payload:</Typography>
-                <JSONPretty id="json-pretty" data={decodedPayload}></JSONPretty>
+                <Typography paragraph variant="body"><JSONPretty style={{overflowWrap: 'break-word'}} id="json-pretty" data={decodedPayload}></JSONPretty></Typography>
                 <Typography paragraph variant="h6">Signature:</Typography>
                 <Typography paragraph>{signatureJWS}</Typography>
               </CardContent>
             </Collapse>
-          </Card>
+          </Container>
         </Container>
       </Box>
     </div>
