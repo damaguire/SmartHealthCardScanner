@@ -194,6 +194,10 @@ const Scanner = () => {
   const handleError = (err) => {
     console.error(err)
   }
+  // 
+  // <CardHeader style={{ textAlign: "center"}}
+  //     subheader="This tool has not been officially reviewed by a security team so use it at your own risk!"
+  //   />
 
   const classes = useStyles();
   const bull = <span className={classes.bullet}>•</span>;
@@ -204,11 +208,8 @@ const Scanner = () => {
         <Container maxWidth="sm" >
           <Card className={classes.root} >
             <CardHeader style={{ textAlign: "center"}}
-              title="Smart Health Card QR Code Scanner"
+              title="SHC QR Scanner"
               subheader="All data is handled client side! Nothing is ever sent to the server!"
-            />
-          <CardHeader style={{ textAlign: "center"}}
-              subheader="This tool has not been officially reviewed by a security team so use it at your own risk!"
             />
           <CardContent style={{display: "flex", justifyContent: "center"}} >
               <QrReader
