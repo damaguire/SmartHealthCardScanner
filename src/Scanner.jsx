@@ -304,7 +304,7 @@ const Scanner = () => {
                 <Typography paragraph variant="h6">Header:</Typography>
                 <ReactJson style={{wordBreak: "break-all"}} collapsed="true" indentWidth="2" src={JSON.parse(decodedHeader)} />
                 <Typography paragraph variant="h6" style={{marginTop: 20}}>Payload:</Typography>
-                <ReactJson style={{wordBreak: "break-all"}} collapsed="true" indentWidth="2" src={JSON.parse(decodedPayload)} />
+                <ReactJson style={{wordBreak: "break-all"}} indentWidth="2" src={JSON.parse(decodedPayload)} />
                 <Typography paragraph variant="h6" style={{marginTop: 20}}>Signature:</Typography>
                 <Typography paragraph variant="body">{signatureJWS}</Typography>
               </Collapse>
