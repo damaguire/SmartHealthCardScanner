@@ -1,6 +1,6 @@
 import React, { Component, useState } from 'react';
 import QrReader from 'react-qr-reader';
-import JSONPretty from 'react-json-pretty';
+import ReactJson from 'react-json-view';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import { makeStyles } from '@material-ui/core/styles';
@@ -25,7 +25,9 @@ const pako = require('pako');
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 2000
+    marginTop:'20px',
+    marginBottom:'40px',
+    wordWrap: 'break-word'
   },
   bullet: {
     display: 'inline-block',
@@ -46,9 +48,8 @@ const Scanner = () => {
   const [headerJWS, setHeaderJWS] = useState('');
   const [payloadJWS, setPayloadJWS] = useState('');
   const [signatureJWS, setSignatureJWS] = useState('');
-  const [decodedHeader, setDecodedHeader] = useState('');
-  const [decodedPayload, setDecodedPayload] = useState('');
-  const [decodedSignature, setDecodedSignature] = useState('');
+  const [decodedHeader, setDecodedHeader] = useState('{}');
+  const [decodedPayload, setDecodedPayload] = useState('{}');
   const [issuer, setIssuer] = useState('');
   const [verified, setVerification] = useState(false);
   const [error, setError] = useState('');
@@ -66,7 +67,8 @@ const Scanner = () => {
   const getIssuerCred = async (data) => {
     try {
       let jwks;
-      const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss
+      const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss;
+      // Accomodates Kaiser's lack of CORS enablement. They are in the VCI directory but I cannot pull their keys.
       if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
         jwks = {
           "keys": [
@@ -196,7 +198,7 @@ const Scanner = () => {
   const classes = useStyles();
   const bull = <span className={classes.bullet}>•</span>;
   return (
-    <div style={{paddingTop:'100px', overflowWrap: 'break-word'}}>
+    <div className={classes.root}>
       <Box display="flex" justifyContent="center">
         <Paper elevation={3} />
         <Container maxWidth="sm" >
@@ -284,32 +286,30 @@ const Scanner = () => {
                 <Typography paragraph>{vaccDate2}</Typography>
               </CardContent>
             </Collapse>
-          </Card>
-          <CardActions disableSpacing>
-            <IconButton
-              className={clsx(classes.expand, {
-                [classes.expandOpen]: expanded,
-              })}
-              onClick={handleExpandClick}
-              aria-expanded={expanded}
-              aria-label="show more"
-            >
-              <ExpandMoreIcon />
-              <p>Full JWS</p>
-            </IconButton>
-          </CardActions>
-          <Container style={{overflowWrap: 'break-word'}}>
-            <Collapse in={expanded} timeout="auto" unmountOnExit>
-              <CardContent>
+            <CardActions disableSpacing>
+              <IconButton
+                className={clsx(classes.expand, {
+                  [classes.expandOpen]: expanded,
+                })}
+                onClick={handleExpandClick}
+                aria-expanded={expanded}
+                aria-label="show more"
+              >
+                <ExpandMoreIcon />
+                <p>Full JWS</p>
+              </IconButton>
+            </CardActions>
+            <CardContent>
+              <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <Typography paragraph variant="h6">Header:</Typography>
-                <JSONPretty id="json-pretty" data={decodedHeader}></JSONPretty>
-                <Typography paragraph variant="h6">Payload:</Typography>
-                <Typography paragraph variant="body"><JSONPretty style={{overflowWrap: 'break-word'}} id="json-pretty" data={decodedPayload}></JSONPretty></Typography>
-                <Typography paragraph variant="h6">Signature:</Typography>
-                <Typography paragraph>{signatureJWS}</Typography>
-              </CardContent>
-            </Collapse>
-          </Container>
+                <ReactJson style={{wordBreak: "break-all"}} collapsed="true" indentWidth="2" src={JSON.parse(decodedHeader)} />
+                <Typography paragraph variant="h6" style={{marginTop: 20}}>Payload:</Typography>
+                <ReactJson style={{wordBreak: "break-all"}} collapsed="true" indentWidth="2" src={JSON.parse(decodedPayload)} />
+                <Typography paragraph variant="h6" style={{marginTop: 20}}>Signature:</Typography>
+                <Typography paragraph variant="body">{signatureJWS}</Typography>
+              </Collapse>
+            </CardContent>
+          </Card>
         </Container>
       </Box>
     </div>

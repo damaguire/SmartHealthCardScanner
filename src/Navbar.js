@@ -12,11 +12,16 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import HomeIcon from '@material-ui/icons/Home';
 import Toolbar from '@material-ui/core/Toolbar';
-import './jwks.json';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    background: 'linear-gradient(45deg, #68B3AF 30%, #C3DBB4 90%)',
+    border: 0,
+    borderRadius: 3,
+    color: 'white',
+    height: 60,
+    padding: '0 30px',
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -28,20 +33,17 @@ const useStyles = makeStyles((theme) => ({
 
 function Navbar() {
   const classes = useStyles();
-  const bull = <span className={classes.bullet}>•</span>;
   return (
-    <div className={classes.root}>
-      <AppBar position="static">
+    <div>
+      <AppBar position="static" className={classes.root}>
         <Toolbar>
           <IconButton href="/" edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
             <HomeIcon />
           </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            Smart Health Card Scanner 1.2
+          <Typography variant="body" className={classes.title}>
+            SHC Scanner
           </Typography>
-          <Button color="inherit" href="/.well-known/jwks.json">JWKS</Button>
-          <Button color="inherit" href="/file">Scan From File</Button>
-          <Button color="inherit" href="https://spec.smarthealth.cards/">Learn More</Button>
+          <Button color="inherit" href="/file" style={{ wordBreak: "break-all", fontSize: '13px'}}>Scan From File</Button>
         </Toolbar>
       </AppBar>
     </div>

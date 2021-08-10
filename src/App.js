@@ -8,13 +8,13 @@ import CardContent from '@material-ui/core/CardContent';
 import Scanner from './Scanner.jsx';
 import ScannerFile from './ScannerFile.jsx';
 import Navbar from './Navbar.js';
+import Footer from './Footer.js';
 import AppBar from '@material-ui/core/AppBar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import Keys from './Jwks.js';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,9 +51,6 @@ function App() {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path="/.well-known/jwks.json">
-          <Keys />
-        </Route>
         <div>
           <Navbar />
           <Route exact path="/">
@@ -62,6 +59,7 @@ function App() {
           <Route path="/file">
             <ScannerFile />
           </Route>
+          <Footer />
         </div>
       </Switch>
     </BrowserRouter>
