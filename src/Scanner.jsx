@@ -1,7 +1,6 @@
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import QrReader from 'react-qr-reader';
 import ReactJson from 'react-json-view';
-import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import { makeStyles } from '@material-ui/core/styles';
 import CardActions from '@material-ui/core/CardActions';
@@ -45,8 +44,6 @@ const useStyles = makeStyles({
 const Scanner = () => {
   const [result, setResult] = useState(false);
   const [scanned, setScanned] = useState(false);
-  const [headerJWS, setHeaderJWS] = useState('');
-  const [payloadJWS, setPayloadJWS] = useState('');
   const [signatureJWS, setSignatureJWS] = useState('');
   const [decodedHeader, setDecodedHeader] = useState('{}');
   const [decodedPayload, setDecodedPayload] = useState('{}');
@@ -68,7 +65,7 @@ const Scanner = () => {
     try {
       let jwks;
       const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss;
-      if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
+      if (issuerHere === "https://kpx-consent-uat.kp.org" || issuerHere === "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
         jwks = {
           "keys": [
             {
@@ -85,26 +82,28 @@ const Scanner = () => {
         setInVCI(false);
       } else {
         let issEndpoint = issuerHere + '/.well-known/jwks.json';
-        const response = await axios.get(issEndpoint)
-        console.log(response.data);
+        const response = await axios.get(issEndpoint);
         jwks = response.data;
       }
-      const keystore = await jose.JWK.asKeyStore(jwks)
-      const result = await jose.JWS.createVerify(keystore).verify(data)
-      setVerification(true)
+      const keystore = await jose.JWK.asKeyStore(jwks);
+      const result = await jose.JWS.createVerify(keystore).verify(data);
+      if(result.key.kid === jwks.keys[0].kid) {
+        setVerification(true)
+      } else {
+        setError('Signature is not valid from the listed issuer.')
+      }
       let issDir = await axios.get("https://raw.githubusercontent.com/the-commons-project/vci-directory/main/vci-issuers.json");
       if(issDir.data.participating_issuers.some(e => e.iss === issuerHere )) {
         setInVCI(true);
-      } else {
       }
       setResult(true)
     } catch (err) {
       setError("Please hold the QR code up for a bit longer!")
-      console.log("ERROR:", err);
+      // console.log("ERROR:", err);
     }
   }
 
-  // this was all a test to figure out a way around issuers not having CORS enabled. It did not work. 
+  // this was all a test to figure out a way around issuers not having CORS enabled. It did not work.
   // const getIssuerCred = async (data) => {
   //   try {
   //     let jwks;
@@ -150,17 +149,14 @@ const Scanner = () => {
       setScanned(true);
       let splitData = data.split("/")[1].match(/(..?)/g).map((number) => String.fromCharCode(parseInt(number, 10) + 45)).join("");
       setIssuer(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).iss)
-      setHeaderJWS(splitData.split(".")[0]);
-      setPayloadJWS(splitData.split(".")[1]);
       setSignatureJWS(splitData.split(".")[2]);
       setDecodedHeader(JSON.stringify(JSON.parse(Buffer.from(splitData.split(".")[0], "base64")), null, 2));
       setDecodedPayload(JSON.stringify(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'}))));
-      console.log(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code);
       setFirstName(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[0].resource.name[0].given[0]);
       setLastName(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[0].resource.name[0].family);
       setMiddleInitial(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[0].resource.name[0].given[1]);
       setBirthDate(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[0].resource.birthDate);
-      if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code == '207'){
+      if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code === '207'){
         setCVXCode("MODERNA");
         setVaccDate1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime);
         try{
@@ -168,7 +164,7 @@ const Scanner = () => {
         } catch (error) {
           setVaccDate2('')
         }
-      } else if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code == '208') {
+      } else if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code === '208') {
         setCVXCode("PFIZER");
         setVaccDate1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime);
         try{
@@ -200,7 +196,6 @@ const Scanner = () => {
   //   />
 
   const classes = useStyles();
-  const bull = <span className={classes.bullet}>•</span>;
   return (
     <div className={classes.root}>
       <Box display="flex" justifyContent="center">

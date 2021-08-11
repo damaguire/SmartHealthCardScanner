@@ -1,7 +1,5 @@
-import React, { Component, useState } from 'react';
-import QrReader from 'react-qr-reader';
+import React, { useState } from 'react';
 import ReactJson from 'react-json-view';
-import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import { makeStyles } from '@material-ui/core/styles';
 import CardActions from '@material-ui/core/CardActions';
@@ -19,7 +17,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
 import clsx from 'clsx';
 import { BrowserQRCodeReader } from '@zxing/browser';
-import {decode as base64_decode, encode as base64_encode} from 'base-64';
 
 const axios = require("axios").default;
 const jose = require('node-jose');
@@ -47,8 +44,6 @@ const useStyles = makeStyles({
 const ScannerFile = () => {
   const [result, setResult] = useState(false);
   const [scanned, setScanned] = useState(false);
-  const [headerJWS, setHeaderJWS] = useState('');
-  const [payloadJWS, setPayloadJWS] = useState('');
   const [signatureJWS, setSignatureJWS] = useState('');
   const [decodedHeader, setDecodedHeader] = useState('{}');
   const [decodedPayload, setDecodedPayload] = useState('{}');
@@ -65,15 +60,13 @@ const ScannerFile = () => {
   const [vaccDate1, setVaccDate1] = useState('');
   const [vaccDate2, setVaccDate2] = useState('');
   const [inVCI, setInVCI] = useState(false);
-  const [img, setIMG] = useState('');
   const [message, setMessage] = useState('Awaiting File Upload');
-  const [shcFile, setSHCFile] = useState('');
 
   const getIssuerCred = async (data) => {
     try {
       let jwks;
       const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss;
-      if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
+      if (issuerHere === "https://kpx-consent-uat.kp.org" || issuerHere === "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
         jwks = {
           "keys": [
             {
@@ -91,48 +84,44 @@ const ScannerFile = () => {
       } else {
         let issEndpoint = issuerHere + '/.well-known/jwks.json';
         const response = await axios.get(issEndpoint)
-        console.log(response.data);
         jwks = response.data;
       }
       const keystore = await jose.JWK.asKeyStore(jwks)
       const result = await jose.JWS.createVerify(keystore).verify(data)
-      setVerification(true)
+      if(result.key.kid === jwks.keys[0].kid) {
+        setVerification(true)
+      } else {
+        setError('Signature is not valid from the listed issuer.')
+      }
       let issDir = await axios.get("https://raw.githubusercontent.com/the-commons-project/vci-directory/main/vci-issuers.json");
       if(issDir.data.participating_issuers.some(e => e.iss === issuerHere )) {
         setInVCI(true);
-      } else {
       }
       setResult(true)
     } catch (err) {
       setError("Please hold the QR code up for a bit longer!")
-      console.log("ERROR:", err);
+      // console.log("ERROR:", err);
     }
   }
 
   const handleScan = (data, type) => {
     if (data) {
-      console.log("DATA", data);
       setScanned(true);
       let splitData;
       if(type === "img") {
-        console.log("IMAGE");
         splitData = data.split("/")[1].match(/(..?)/g).map((number) => String.fromCharCode(parseInt(number, 10) + 45)).join("");
       } else {
         splitData = data;
       }
-      console.log(splitData);
       setIssuer(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).iss)
-      setHeaderJWS(splitData.split(".")[0]);
-      setPayloadJWS(splitData.split(".")[1]);
       setSignatureJWS(splitData.split(".")[2]);
       setDecodedHeader(JSON.stringify(JSON.parse(Buffer.from(splitData.split(".")[0], "base64"))));
       setDecodedPayload(JSON.stringify(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'}))));
-      console.log(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code);
       setFirstName(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[0].resource.name[0].given[0]);
       setLastName(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[0].resource.name[0].family);
       setMiddleInitial(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[0].resource.name[0].given[1]);
       setBirthDate(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[0].resource.birthDate);
-      if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code == '207'){
+      if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code === '207'){
         setCVXCode("MODERNA");
         setVaccDate1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime);
         try{
@@ -140,7 +129,7 @@ const ScannerFile = () => {
         } catch (error) {
           setVaccDate2('')
         }
-      } else if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code == '208') {
+      } else if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code === '208') {
         setCVXCode("PFIZER");
         setVaccDate1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime);
         try{
@@ -163,10 +152,6 @@ const ScannerFile = () => {
     setExpanded2(!expanded2);
   };
 
-  const handleError = (err) => {
-    console.error(err)
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     let fileName = e.target.files[0].name;
@@ -180,7 +165,6 @@ const ScannerFile = () => {
         setMessage("Unable to read QR in file. Please try a different one!")
       }
     } else if (fileName.slice(fileName.length - 18) === '.smart-health-card') {
-      console.log("shc file");
       const reader = new FileReader()
       let text;
       reader.readAsText(e.target.files[0]);
@@ -195,7 +179,6 @@ const ScannerFile = () => {
   }
 
   const classes = useStyles();
-  const bull = <span className={classes.bullet}>•</span>;
   return (
     <div className={classes.root}>
       <Box display="flex" justifyContent="center">
