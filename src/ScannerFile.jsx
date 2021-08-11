@@ -73,8 +73,7 @@ const ScannerFile = () => {
     try {
       let jwks;
       const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss;
-      // Accomodates Kaiser's lack of CORS enablement. They are in the VCI directory but I cannot pull their keys.
-      if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1" || issuerHere == "https://20.36.29.51:9091") {
+      if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
         jwks = {
           "keys": [
             {

@@ -68,7 +68,6 @@ const Scanner = () => {
     try {
       let jwks;
       const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss;
-      // Accomodates Kaiser's lack of CORS enablement. They are in the VCI directory but I cannot pull their keys.
       if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
         jwks = {
           "keys": [
@@ -105,6 +104,7 @@ const Scanner = () => {
     }
   }
 
+  // this was all a test to figure out a way around issuers not having CORS enabled. It did not work. 
   // const getIssuerCred = async (data) => {
   //   try {
   //     let jwks;
@@ -194,7 +194,7 @@ const Scanner = () => {
   const handleError = (err) => {
     console.error(err)
   }
-  // 
+  //
   // <CardHeader style={{ textAlign: "center"}}
   //     subheader="This tool has not been officially reviewed by a security team so use it at your own risk!"
   //   />
