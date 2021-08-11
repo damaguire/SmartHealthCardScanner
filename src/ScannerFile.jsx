@@ -73,8 +73,8 @@ const ScannerFile = () => {
     try {
       let jwks;
       const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss;
-            // Accomodates Kaiser's lack of CORS enablement. They are in the VCI directory but I cannot pull their keys.
-      if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
+      // Accomodates Kaiser's lack of CORS enablement. They are in the VCI directory but I cannot pull their keys.
+      if (issuerHere == "https://kpx-consent-uat.kp.org" || issuerHere == "https://hpp.kaiserpermanente.org/public-keys/shc/v1" || issuerHere == "https://20.36.29.51:9091") {
         jwks = {
           "keys": [
             {
@@ -181,6 +181,7 @@ const ScannerFile = () => {
         setMessage("Unable to read QR in file. Please try a different one!")
       }
     } else if (fileName.slice(fileName.length - 18) === '.smart-health-card') {
+      console.log("shc file");
       const reader = new FileReader()
       let text;
       reader.readAsText(e.target.files[0]);
@@ -301,7 +302,7 @@ const ScannerFile = () => {
                 <Typography paragraph variant="h6">Header:</Typography>
                 <ReactJson style={{wordBreak: "break-all"}} collapsed="true" indentWidth="2" src={JSON.parse(decodedHeader)} />
                 <Typography paragraph variant="h6" style={{marginTop: 20}}>Payload:</Typography>
-                <ReactJson style={{wordBreak: "break-all"}} collapsed="true" indentWidth="2" src={JSON.parse(decodedPayload)} />
+                <ReactJson style={{wordBreak: "break-all"}} indentWidth="2" src={JSON.parse(decodedPayload)} />
                 <Typography paragraph variant="h6" style={{marginTop: 20}}>Signature:</Typography>
                 <Typography paragraph variant="body">{signatureJWS}</Typography>
               </Collapse>
