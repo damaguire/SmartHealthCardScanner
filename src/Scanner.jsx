@@ -65,26 +65,9 @@ const Scanner = () => {
     try {
       let jwks;
       const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss;
-      if (issuerHere === "https://kpx-consent-uat.kp.org" || issuerHere === "https://hpp.kaiserpermanente.org/public-keys/shc/v1") {
-        jwks = {
-          "keys": [
-            {
-              "kty": "EC",
-              "kid": "2bPE3l4LxynUR5KSLnEu7un0wSd3BvKnlYa3RU65DTU",
-              "use": "sig",
-              "alg": "ES256",
-              "crv": "P-256",
-              "x": "mvcD0OU0MNbqnvHoo7xqomxDcF5-lDjosplo8ajHTfU",
-              "y": "yBGAkYj3BN-zkn6RCfGzz-H38obadiit9Are_RdcLzQ"
-            }
-          ]
-        };
-        setInVCI(false);
-      } else {
-        let issEndpoint = issuerHere + '/.well-known/jwks.json';
-        const response = await axios.get(issEndpoint);
-        jwks = response.data;
-      }
+      let issEndpoint = issuerHere + '/.well-known/jwks.json';
+      const response = await axios.get(issEndpoint);
+      jwks = response.data;
       const keystore = await jose.JWK.asKeyStore(jwks);
       const result = await jose.JWS.createVerify(keystore).verify(data);
       if(result.key.kid === jwks.keys[0].kid) {
@@ -99,50 +82,8 @@ const Scanner = () => {
       setResult(true)
     } catch (err) {
       setError("Please hold the QR code up for a bit longer!")
-      // console.log("ERROR:", err);
     }
   }
-
-  // this was all a test to figure out a way around issuers not having CORS enabled. It did not work.
-  // const getIssuerCred = async (data) => {
-  //   try {
-  //     let jwks;
-  //     const issuerHere = JSON.parse(pako.inflateRaw(Buffer.from(data.split(".")[1], "base64"), { to: 'string'})).iss
-  //     let issEndpoint = issuerHere + '/.well-known/jwks.json';
-  //     // const myInit = {
-  //     //   method: 'GET'
-  //     // };
-  //     //
-  //     // const myRequest = new Request(issEndpoint, myInit);
-  //     // console.log("fetch", await fetch(myRequest));
-  //     // fetch(myRequest).then(function(response) {
-  //   	// 	return response;
-  //   	// }).then(function(response) {
-  //   	// 	console.log("HERE IS THE RESPONSE", response);
-  //   	// }).catch(function(e){
-  //   	// 	console.log(e);
-  //   	// });
-  //     // console.log("CALL", fR);
-  //     // const response = await axios.get(issEndpoint, {
-  //     //   headers: {
-  //     //     'Origin': "null"
-  //     //   }
-  //     // })
-  //     // jwks = response.data;
-  //     // const keystore = await jose.JWK.asKeyStore(jwks)
-  //     // const result = await jose.JWS.createVerify(keystore).verify(data)
-  //     // setVerification(true)
-  //     // let issDir = await axios.get("https://raw.githubusercontent.com/the-commons-project/vci-directory/main/vci-issuers.json");
-  //     // if(issDir.data.participating_issuers.some(e => e.iss === issuerHere )) {
-  //     //   setInVCI(true);
-  //     // } else {
-  //     // }
-  //     setResult(true)
-  //   } catch (err) {
-  //     setError("Please hold the QR code up for a bit longer!")
-  //     console.log("ERROR:", err);
-  //   }
-  // }
 
   const handleScan = (data) => {
     if (data) {
