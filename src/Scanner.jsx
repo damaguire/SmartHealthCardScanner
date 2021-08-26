@@ -159,7 +159,7 @@ const Scanner = () => {
       let issuerCred = getIssuerCred(splitData);
       let buf = await generateQR(data);
       const existingPdfBytes = await fetch(
-        "/BlankSHCforDL.pdf"
+        process.env.PUBLIC_URL + "/BlankSHCforDL.pdf"
       ).then((res) => res.arrayBuffer());
       // var bytes = new Uint8Array(existingPdfBytes);
       const pdfDoc = await PDFDocument.load(existingPdfBytes)
