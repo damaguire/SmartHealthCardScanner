@@ -16,6 +16,8 @@
     "http2-wrapper": "^2.1.1",
     "node-jose": "^2.0.0",
     "pako": "^2.0.3",
+    "pdf-lib": "^1.16.0",
+    "qrcode": "^1.4.4",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.1",
     "react-dom": "^17.0.2",
