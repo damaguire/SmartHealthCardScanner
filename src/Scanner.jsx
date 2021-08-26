@@ -462,6 +462,10 @@ const Scanner = () => {
     console.error(err)
   }
 
+  // <a href={pdfBytes2} download={fileName}>
+  //    <Button className={classes.button}>Download as PDF</Button>
+  // </a>
+
   const classes = useStyles();
   return (
     <div className={classes.root}>
@@ -504,9 +508,6 @@ const Scanner = () => {
                           <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Payload Verified!</p>
                           <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Signature Verified!</p>
                           <p style={{color: "green"}}><CheckCircleOutlineIcon style={{fill: "green"}}/> Issuer Verified in VCI Directory!</p>
-                          <a href={pdfBytes2} download={fileName}>
-                             <Button className={classes.button}>Download as PDF</Button>
-                          </a>
                         </div>
                         :
                         <div>
