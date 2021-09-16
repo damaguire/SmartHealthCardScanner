@@ -94,7 +94,7 @@ const ScannerFile = () => {
       jwks = response.data;
       const keystore = await jose.JWK.asKeyStore(jwks);
       const result = await jose.JWS.createVerify(keystore).verify(data);
-      if(result.key.kid === jwks.keys[0].kid) {
+      if(result.key.kid === jwks.keys[0].kid || result.key.kid === jwks.keys[1].kid) {
         setVerification(true)
       } else {
         setError('Signature is not valid from the listed issuer.')
@@ -232,22 +232,24 @@ const ScannerFile = () => {
             font: helveticaFont,
             color: rgb(.10, .10, .30),
           });
-          firstPage.drawText("Moderna, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
-            x: 82,
-            y: height / 2 + 58,
-            size: 12,
-            font: helveticaBold,
-            color: rgb(.10, .10, .30),
-          });
-          // Draw the second vaccination event information on the page
-          firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.occurrenceDateTime  + ", Dose 2, " +
-            JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.performer[0].actor.display, {
-            x: 82,
-            y: height / 2 + 28,
-            size: 10,
-            font: helveticaFont,
-            color: rgb(.10, .10, .30),
-          });
+          if(vaccDate2 != '') {
+            firstPage.drawText("Moderna, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
+              x: 82,
+              y: height / 2 + 58,
+              size: 12,
+              font: helveticaBold,
+              color: rgb(.10, .10, .30),
+            });
+            // Draw the second vaccination event information on the page
+            firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.occurrenceDateTime  + ", Dose 2, " +
+              JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.performer[0].actor.display, {
+              x: 82,
+              y: height / 2 + 28,
+              size: 10,
+              font: helveticaFont,
+              color: rgb(.10, .10, .30),
+            });
+          }
           break;
         // Pfizer
         case "208":
@@ -267,22 +269,24 @@ const ScannerFile = () => {
             font: helveticaFont,
             color: rgb(.10, .10, .30),
           });
-          firstPage.drawText("Pfizer, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
-            x: 82,
-            y: height / 2 + 58,
-            size: 12,
-            font: helveticaBold,
-            color: rgb(.10, .10, .30),
-          });
-          // Draw the second vaccination event information on the page
-          firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.occurrenceDateTime + ", Dose 2, " +
-            JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.performer[0].actor.display, {
-            x: 82,
-            y: height / 2 + 28,
-            size: 10,
-            font: helveticaFont,
-            color: rgb(.10, .10, .30),
-          });
+          if(vaccDate2 != '') {
+            firstPage.drawText("Pfizer, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
+              x: 82,
+              y: height / 2 + 58,
+              size: 12,
+              font: helveticaBold,
+              color: rgb(.10, .10, .30),
+            });
+            // Draw the second vaccination event information on the page
+            firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.occurrenceDateTime + ", Dose 2, " +
+              JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.performer[0].actor.display, {
+              x: 82,
+              y: height / 2 + 28,
+              size: 10,
+              font: helveticaFont,
+              color: rgb(.10, .10, .30),
+            });
+          }
         break;
       }
       const pdfBytes = await pdfDoc.save();
