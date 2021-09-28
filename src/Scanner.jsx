@@ -128,11 +128,12 @@ const Scanner = () => {
         JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[0].resource.name[0].family +"_SHC.pdf");
       if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.vaccineCode.coding[0].code === '207'){
         setCVXCode("MODERNA");
-        setCVXCodeNum("207")
+        setCVXCodeNum("207");
+        console.log(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc);
         setVaccDate1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime);
         setLotNumber1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.lotNumber);
-        setPerformer1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display);
         try{
+          setPerformer1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display);
           setVaccDate2(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.occurrenceDateTime);
           setLotNumber2(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber);
           setPerformer2(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.performer[0].actor.display);
@@ -144,8 +145,8 @@ const Scanner = () => {
         setCVXCodeNum("208")
         setVaccDate1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime);
         setLotNumber1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.lotNumber);
-        setPerformer1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display);
         try{
+          setPerformer1(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display);
           setVaccDate2(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.occurrenceDateTime);
           setLotNumber2(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber);
           setPerformer2(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.performer[0].actor.display);
@@ -235,14 +236,18 @@ const Scanner = () => {
             color: rgb(.10, .10, .30),
           });
           // Draw the first vaccination event information on the page
-          firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime + ", Dose 1, " +
-            JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display, {
-            x: 82,
-            y: height / 2 + 97,
-            size: 10,
-            font: helveticaFont,
-            color: rgb(.10, .10, .30),
-          });
+          try{
+            firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime + ", Dose 1, " +
+              JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display, {
+              x: 82,
+              y: height / 2 + 97,
+              size: 10,
+              font: helveticaFont,
+              color: rgb(.10, .10, .30),
+            });
+          } catch (error) {
+            console.log(error);
+          }
           if(vaccDate2 !== '') {
             firstPage.drawText("Moderna, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,
@@ -273,13 +278,18 @@ const Scanner = () => {
             color: rgb(.10, .10, .30),
           });
           // Draw the first vaccination event information on the page
-          firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime + ", Dose 1, " + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display, {
-            x: 82,
-            y: height / 2 + 97,
-            size: 10,
-            font: helveticaFont,
-            color: rgb(.10, .10, .30),
-          });
+          try{
+            firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime + ", Dose 1, " +
+              JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display, {
+              x: 82,
+              y: height / 2 + 97,
+              size: 10,
+              font: helveticaFont,
+              color: rgb(.10, .10, .30),
+            });
+          } catch (error) {
+            console.log(error);
+          }
           if(vaccDate2 !== '') {
             firstPage.drawText("Pfizer, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,

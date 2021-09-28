@@ -227,14 +227,18 @@ const ScannerFile = () => {
             color: rgb(.10, .10, .30),
           });
           // Draw the first vaccination event information on the page
-          firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime + ", Dose 1, " +
-            JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display, {
-            x: 82,
-            y: height / 2 + 97,
-            size: 10,
-            font: helveticaFont,
-            color: rgb(.10, .10, .30),
-          });
+          try{
+            firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime + ", Dose 1, " +
+              JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display, {
+              x: 82,
+              y: height / 2 + 97,
+              size: 10,
+              font: helveticaFont,
+              color: rgb(.10, .10, .30),
+            });
+          } catch (error) {
+            console.log(error);
+          }
           if(vaccDate2 !== '') {
             firstPage.drawText("Moderna, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,
@@ -265,13 +269,18 @@ const ScannerFile = () => {
             color: rgb(.10, .10, .30),
           });
           // Draw the first vaccination event information on the page
-          firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime + ", Dose 1, " + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display, {
-            x: 82,
-            y: height / 2 + 97,
-            size: 10,
-            font: helveticaFont,
-            color: rgb(.10, .10, .30),
-          });
+          try{
+            firstPage.drawText(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime + ", Dose 1, " +
+              JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display, {
+              x: 82,
+              y: height / 2 + 97,
+              size: 10,
+              font: helveticaFont,
+              color: rgb(.10, .10, .30),
+            });
+          } catch (error) {
+            console.log(error);
+          }
           if(vaccDate2 !== '') {
             firstPage.drawText("Pfizer, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,
@@ -324,6 +333,7 @@ const ScannerFile = () => {
       const codeReader = new BrowserQRCodeReader();
       try{
         const resultImage = await codeReader.decodeFromImageUrl(uplIMG);
+        console.log(resultImage);
         handleScan(resultImage.text, "img");
       } catch (error) {
         console.log(error);
