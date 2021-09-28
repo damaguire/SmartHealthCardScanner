@@ -93,11 +93,14 @@ const Scanner = () => {
       jwks = response.data;
       const keystore = await jose.JWK.asKeyStore(jwks);
       const result = await jose.JWS.createVerify(keystore).verify(data);
-      if(result.key.kid === jwks.keys[0].kid || result.key.kid === jwks.keys[1].kid) {
-        setVerification(true)
-      } else {
-        setError('Signature is not valid from the listed issuer.')
-      }
+      jwks.keys.forEach(e => {
+        if(result.key.kid === e.kid) {
+          console.log(e.kid);
+          setVerification(true);
+        } else {
+          setError('Signature is not valid from the listed issuer.')
+        }
+      })
       let issDir = await axios.get("https://raw.githubusercontent.com/the-commons-project/vci-directory/main/vci-issuers.json");
       if(issDir.data.participating_issuers.some(e => e.iss === issuerHere )) {
         setInVCI(true);
@@ -240,7 +243,7 @@ const Scanner = () => {
             font: helveticaFont,
             color: rgb(.10, .10, .30),
           });
-          if(vaccDate2 != '') {
+          if(vaccDate2 !== '') {
             firstPage.drawText("Moderna, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,
               y: height / 2 + 58,
@@ -277,7 +280,7 @@ const Scanner = () => {
             font: helveticaFont,
             color: rgb(.10, .10, .30),
           });
-          if(vaccDate2 != '') {
+          if(vaccDate2 !== '') {
             firstPage.drawText("Pfizer, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,
               y: height / 2 + 58,
@@ -314,146 +317,6 @@ const Scanner = () => {
       console.error(err)
     }
   }
-
-  // const createPDF = async () => {
-  //   console.log("RUNNING");
-  //   let buf = await generateQR(shcURI);
-  //   const existingPdfBytes = await fetch(
-  //     "./BlankSHCforDL.pdf"
-  //   ).then((res) => res.arrayBuffer());
-  //   // var bytes = new Uint8Array(existingPdfBytes);
-  //   const pdfDoc = await PDFDocument.load(existingPdfBytes)
-  //   // Load in both fonts we wish to use
-  //   const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  //   const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  //   // Get the number of pages in the PDF doc (demo is only one page)
-  //   const pages = pdfDoc.getPages();
-  //   // Get the first page
-  //   const firstPage = pages[0];
-  //   // Get the PDF width and height and assign to variables
-  //   const { width, height } = firstPage.getSize();
-  //   // Convert the pngURI into image bytes
-  //   console.log("buf", buf);
-  //   const pngImage = await pdfDoc.embedPng(buf);
-  //   const pngDims = pngImage.scale(0.45)
-  //
-  //   firstPage.drawText(firstName + " " + lastName, {
-  //     x: 52,
-  //     y: height / 2 + 170,
-  //     size: 12,
-  //     font: helveticaBold,
-  //     color: rgb(.10, .10, .30),
-  //   });
-  //   // Draw the patients birth date on the PDF
-  //   firstPage.drawText(birthDate, {
-  //     x: 213,
-  //     y: height / 2 + 170,
-  //     size: 12,
-  //     font: helveticaBold,
-  //     color: rgb(.10, .10, .30),
-  //   });
-  //
-  //   firstPage.drawImage(pngImage, {
-  //     x: 762 / 2 - pngDims.width / 2 + 75,
-  //     y: height / 2 - pngDims.height + 245,
-  //     width: pngDims.width,
-  //     height: pngDims.height,
-  //   })
-  //   switch(cvxCodeNum) {
-  //     // JnJ
-  //     case "212":
-  //       // Draw the vaccine manufacturer name and lot on the page
-  //       firstPage.drawText("Johnson and Johnson, Lot#" + lotNumber1, {
-  //         x: 82,
-  //         y: height / 2 + 127,
-  //         size: 12,
-  //         font: helveticaBold,
-  //         color: rgb(.10, .10, .30),
-  //       });
-  //       // Draw the first vaccination event information on the page
-  //       firstPage.drawText(vaccDate1 + ", Dose 1 " + performer1, {
-  //         x: 82,
-  //         y: height / 2 + 97,
-  //         size: 10,
-  //         font: helveticaFont,
-  //         color: rgb(.10, .10, .30),
-  //       });
-  //       break;
-  //     // Moderna
-  //     case "207":
-  //       // Draw the vaccine manufacturer name and lot on the page
-  //       firstPage.drawText("Moderna, Lot#" + lotNumber1, {
-  //         x: 82,
-  //         y: height / 2 + 127,
-  //         size: 12,
-  //         font: helveticaBold,
-  //         color: rgb(.10, .10, .30),
-  //       });
-  //       // Draw the first vaccination event information on the page
-  //       firstPage.drawText(vaccDate1 + ", Dose 1, " + performer1, {
-  //         x: 82,
-  //         y: height / 2 + 97,
-  //         size: 10,
-  //         font: helveticaFont,
-  //         color: rgb(.10, .10, .30),
-  //       });
-  //       firstPage.drawText("Moderna, Lot#" + lotNumber2, {
-  //         x: 82,
-  //         y: height / 2 + 58,
-  //         size: 12,
-  //         font: helveticaBold,
-  //         color: rgb(.10, .10, .30),
-  //       });
-  //       // Draw the second vaccination event information on the page
-  //       firstPage.drawText(vaccDate2  + ", Dose 2, " + performer2, {
-  //         x: 82,
-  //         y: height / 2 + 28,
-  //         size: 10,
-  //         font: helveticaFont,
-  //         color: rgb(.10, .10, .30),
-  //       });
-  //       break;
-  //     // Pfizer
-  //     case "208":
-  //       // Draw the vaccine manufacturer name and lot on the page
-  //       firstPage.drawText("Pfizer, Lot#" + lotNumber1, {
-  //         x: 82,
-  //         y: height / 2 + 127,
-  //         size: 12,
-  //         font: helveticaBold,
-  //         color: rgb(.10, .10, .30),
-  //       });
-  //       // Draw the first vaccination event information on the page
-  //       firstPage.drawText(vaccDate1 + ", Dose 1, " + performer1, {
-  //         x: 82,
-  //         y: height / 2 + 97,
-  //         size: 10,
-  //         font: helveticaFont,
-  //         color: rgb(.10, .10, .30),
-  //       });
-  //       firstPage.drawText("Pfizer, Lot#" + lotNumber2, {
-  //         x: 82,
-  //         y: height / 2 + 58,
-  //         size: 12,
-  //         font: helveticaBold,
-  //         color: rgb(.10, .10, .30),
-  //       });
-  //       // Draw the second vaccination event information on the page
-  //       firstPage.drawText(vaccDate2 + ", Dose 2, " + performer2, {
-  //         x: 82,
-  //         y: height / 2 + 28,
-  //         size: 10,
-  //         font: helveticaFont,
-  //         color: rgb(.10, .10, .30),
-  //       });
-  //     break;
-  //   }
-  //   const pdfBytes = await pdfDoc.save();
-  //   var bytes = new Uint8Array(pdfBytes);
-  //   var blob = new Blob([bytes], { type: "application/pdf" });
-  //   const docUrl = URL.createObjectURL(blob);
-  //   setPDFBytes2(docUrl);
-  // }
 
   const handleExpandClick = () => {
     setExpanded(!expanded);

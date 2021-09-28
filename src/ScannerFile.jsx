@@ -94,11 +94,14 @@ const ScannerFile = () => {
       jwks = response.data;
       const keystore = await jose.JWK.asKeyStore(jwks);
       const result = await jose.JWS.createVerify(keystore).verify(data);
-      if(result.key.kid === jwks.keys[0].kid || result.key.kid === jwks.keys[1].kid) {
-        setVerification(true)
-      } else {
-        setError('Signature is not valid from the listed issuer.')
-      }
+      jwks.keys.forEach(e => {
+        if(result.key.kid === e.kid) {
+          console.log(e.kid);
+          setVerification(true);
+        } else {
+          setError('Signature is not valid from the listed issuer.')
+        }
+      })
       let issDir = await axios.get("https://raw.githubusercontent.com/the-commons-project/vci-directory/main/vci-issuers.json");
       if(issDir.data.participating_issuers.some(e => e.iss === issuerHere )) {
         setInVCI(true);
@@ -232,7 +235,7 @@ const ScannerFile = () => {
             font: helveticaFont,
             color: rgb(.10, .10, .30),
           });
-          if(vaccDate2 != '') {
+          if(vaccDate2 !== '') {
             firstPage.drawText("Moderna, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,
               y: height / 2 + 58,
@@ -269,7 +272,7 @@ const ScannerFile = () => {
             font: helveticaFont,
             color: rgb(.10, .10, .30),
           });
-          if(vaccDate2 != '') {
+          if(vaccDate2 !== '') {
             firstPage.drawText("Pfizer, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,
               y: height / 2 + 58,
@@ -323,6 +326,7 @@ const ScannerFile = () => {
         const resultImage = await codeReader.decodeFromImageUrl(uplIMG);
         handleScan(resultImage.text, "img");
       } catch (error) {
+        console.log(error);
         setMessage("Unable to read QR in file. Please try a different one!")
       }
     } else if (fileName.slice(fileName.length - 18) === '.smart-health-card') {
