@@ -1,5 +1,7 @@
 # Smart Health Card Scanning Application
 
+__*BOOSTER SHOT WORK IS IN PROGRESS*__
+
 [Website available here](https://www.shcverifier.com)
 
 This application was built to assist in the scanning, reading, and verifing of Smart Health Cards (SHC). It allows individuals to test their created SHC's for validity as well as allows those who have been provided SHC's the ability to see what information is contained within them. 
