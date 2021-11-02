@@ -1,6 +1,8 @@
 import React from 'react';
 import Scanner from './Scanner.jsx';
+import ScannerUpdated from './ScannerUpdated.jsx';
 import ScannerFile from './ScannerFile.jsx';
+import ScannerFileUpdated from './ScannerFileUpdated.jsx';
 import Navbar from './Navbar.js';
 import Footer from './Footer.js';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
@@ -12,10 +14,10 @@ function App() {
         <div>
           <Navbar />
           <Route exact path="/">
-            <Scanner />
+            <ScannerUpdated />
           </Route>
           <Route path="/file">
-            <ScannerFile />
+            <ScannerFileUpdated />
           </Route>
           <Footer />
         </div>
