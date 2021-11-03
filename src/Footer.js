@@ -2,7 +2,6 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
-import Box from '@material-ui/core/Box';
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -31,10 +30,10 @@ function Footer() {
   const classes = useStyles();
   return (
     <div>
-        <AppBar position="fixed" color="primary" className={classes.appBar}>
-          <Button color="inherit" href="https://github.com/damaguire/SmartHealthCardScanner" className={classes.fabButton}>Github Repo</Button>
-          <Button color="inherit" href="https://github.com/damaguire/SmartHealthCardScanner/commits/main" className={classes.fabButton2}>v1.3</Button>
-        </AppBar>
+      <AppBar position="fixed" color="primary" className={classes.appBar}>
+        <Button color="inherit" href="https://github.com/damaguire/SmartHealthCardScanner" className={classes.fabButton}>Github Repo</Button>
+        <Button color="inherit" href="https://github.com/damaguire/SmartHealthCardScanner/commits/main" className={classes.fabButton2}>v1.3</Button>
+      </AppBar>
     </div>
   );
 }
