@@ -4,6 +4,8 @@ __*BOOSTER SHOT WORK IS IN PROGRESS*__
 
 [Website available here](https://www.shcverifier.com)
 
+---
+
 If you would like to build it locally, just run the code below:
 
 ```
@@ -12,6 +14,8 @@ cd SmartHealthCardScanner
 npm install
 npm start
 ```
+
+---
 
 The app will start on localhost:8080
 
