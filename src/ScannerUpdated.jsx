@@ -205,19 +205,16 @@ const ScannerUpdated = () => {
     // Get the PDF width and height and assign to variables
     const { width, height } = firstPage.getSize();
     // Convert the pngURI into image bytes
-    console.log("buf", buf);
     const pngImage = await pdfDoc.embedPng(buf);
     const pngDims = pngImage.scale(0.45);
     let actor1;
     let actor2;
     if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer == null) {
-      console.log("undefined");
       actor1 = "Performer was not provided"
     } else {
       actor1 = JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display
     }
     if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.performer== null) {
-      console.log("undefined");
       actor2 = "Performer was not provided"
     } else {
       actor2 = JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.performer[0].actor.display
@@ -270,7 +267,6 @@ const ScannerUpdated = () => {
         } catch (error) {
           console.log(error);
         }
-        console.log("here",vaccDate1 );
         if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime !== '') {
           firstPage.drawText("AstraZeneca, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.lotNumber, {
             x: 82,
@@ -310,7 +306,6 @@ const ScannerUpdated = () => {
         } catch (error) {
           console.log(error);
         }
-        console.log("here",vaccDate1 );
         if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.occurrenceDateTime !== '') {
           firstPage.drawText("AstraZeneca, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
             x: 82,
@@ -375,7 +370,6 @@ const ScannerUpdated = () => {
           } catch (error) {
             console.log(error);
           }
-          console.log("here",vaccDate1 );
           if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime !== '') {
             firstPage.drawText("Moderna, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.lotNumber, {
               x: 82,
@@ -415,7 +409,6 @@ const ScannerUpdated = () => {
           } catch (error) {
             console.log(error);
           }
-          console.log("here",vaccDate1 );
           if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.occurrenceDateTime !== '') {
             firstPage.drawText("Moderna, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,
@@ -460,7 +453,6 @@ const ScannerUpdated = () => {
           } catch (error) {
             console.log(error);
           }
-          console.log("here",vaccDate1 );
           if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime !== '') {
             firstPage.drawText("Pfizer, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[1].resource.lotNumber, {
               x: 82,
@@ -500,7 +492,6 @@ const ScannerUpdated = () => {
           } catch (error) {
             console.log(error);
           }
-          console.log("here",vaccDate1 );
           if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.occurrenceDateTime !== '') {
             firstPage.drawText("Pfizer, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,

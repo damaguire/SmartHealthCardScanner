@@ -414,7 +414,6 @@ const ScannerFile = () => {
           } catch (error) {
             console.log(error);
           }
-          console.log("here",vaccDate1 );
           if(JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.occurrenceDateTime !== '') {
             firstPage.drawText("Moderna, Lot#" + JSON.parse(pako.inflateRaw(Buffer.from(splitData.split(".")[1], "base64"), { to: 'string'})).vc.credentialSubject.fhirBundle.entry[2].resource.lotNumber, {
               x: 82,
