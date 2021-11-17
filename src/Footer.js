@@ -32,7 +32,7 @@ function Footer() {
     <div>
       <AppBar position="fixed" color="primary" className={classes.appBar}>
         <Button color="inherit" href="https://github.com/damaguire/SmartHealthCardScanner" className={classes.fabButton}>Github Repo</Button>
-        <Button color="inherit" href="https://github.com/damaguire/SmartHealthCardScanner/commits/main" className={classes.fabButton2}>v1.3.1</Button>
+        <Button color="inherit" href="https://github.com/damaguire/SmartHealthCardScanner/commits/main" className={classes.fabButton2}>v1.3.2</Button>
       </AppBar>
     </div>
   );
