@@ -1,5 +1,7 @@
 # Smart Health Card Scanning Application
 
+# DEPRECATED AS THERE ARE MANY OTHER BETTER TOOLS AVAILABLE TO DO THIS!
+
 __*BOOSTER SHOT WORK IS IN PROGRESS*__
 
 [Website available here](https://www.shcverifier.com)
